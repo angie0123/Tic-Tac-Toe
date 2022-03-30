@@ -29,4 +29,12 @@ body {
 .square {
   aspect-ratio: 1;
   background: pink;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 8rem;
+}
+
+.square:hover {
+  cursor: pointer;
 }
