@@ -1,5 +1,5 @@
 const board = (() => {
-  const gameBoard = [null, null, null, null, null, null, null, null, null];
+  const gameBoard = [];
   const placeAt = (player, index) => {
     gameBoard[index] = player.sign;
     console.log(gameBoard);
