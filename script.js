@@ -2,29 +2,32 @@ const board = (() => {
   const gameBoard = [null, null, null, null, null, null, null, null, null];
   const placeAt = (player, index) => {
     gameBoard[index] = player.sign;
-    console.log(gameBoard);
   };
   const isEmpty = (index) => {
     return gameBoard[index] === null;
   };
-  return { placeAt, isEmpty };
+  const getSign = (index) => {
+    return gameBoard[index];
+  };
+  return { placeAt, isEmpty, getSign };
 })();
 
-const player = (sign) => {
-  return { sign };
+const player = (sign, name) => {
+  return { sign, name };
 };
 
 const game = (() => {
-  const playerA = player("O");
-  const playerB = player("X");
+  const playerA = player("O", "Player A");
+  const playerB = player("X", "Player B");
 
   let nextTurn = false;
 
   const getCurrentPlayer = () => {
-    return nextTurn ? playerB : playerA;
-  };
-  const nextPlayer = (nextTurn) => {
     return nextTurn ? playerA : playerB;
+  };
+
+  const getNextPlayer = () => {
+    return nextTurn ? playerB : playerA;
   };
 
   const start = () => {
@@ -40,7 +43,40 @@ const game = (() => {
   const updateMove = (index) => {
     board.placeAt(getCurrentPlayer(), index);
     displayController.updateBoard(getCurrentPlayer(), index);
+    if (isWinningMove(index)) {
+      // displayController.displayWinner();
+      console.log(`${getCurrentPlayer().name} wins!`);
+    }
     nextTurn = !nextTurn;
+  };
+
+  const winningConditions = [
+    // rows
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    //columns
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    //diagonals
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+
+  const isWinningMove = (index) => {
+    // checks for which array contains index, and checks if all indices in array have the same sign
+    const possibleWins = winningConditions.filter((condition) => {
+      return condition.includes(Number(index));
+    });
+
+    for (let condition of possibleWins) {
+      if (
+        condition.every((pos) => board.getSign(pos) === getCurrentPlayer().sign)
+      )
+        return true;
+    }
+    return false;
   };
 
   return { start, validateMove };
