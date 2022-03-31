@@ -1,5 +1,5 @@
 const board = (() => {
-  const gameBoard = [null, null, null, null, null, null, null, null, null];
+  let gameBoard = [null, null, null, null, null, null, null, null, null];
   const placeAt = (player, index) => {
     gameBoard[index] = player.sign;
   };
@@ -14,7 +14,11 @@ const board = (() => {
     return !gameBoard.includes(null);
   };
 
-  return { placeAt, isEmpty, getSign, isFull };
+  const reset = () => {
+    gameBoard = [null, null, null, null, null, null, null, null, null];
+  };
+
+  return { placeAt, isEmpty, getSign, isFull, reset };
 })();
 
 const player = (sign, name) => {
@@ -31,8 +35,9 @@ const game = (() => {
     return nextTurn ? playerA : playerB;
   };
 
-  const getNextPlayer = () => {
-    return nextTurn ? playerB : playerA;
+  const reset = () => {
+    nextTurn = false;
+    board.reset();
   };
 
   const start = () => {
@@ -50,12 +55,17 @@ const game = (() => {
     displayController.updateBoard(getCurrentPlayer(), index);
     if (isWinningMove(index)) {
       displayController.displayResults(getCurrentPlayer().name);
+      setTimeout(reset, 2000);
+      return;
     }
     if (isDraw()) {
       console.log("draw");
       displayController.displayResults("draw");
+      setTimeout(reset, 2000);
+      return;
     }
     nextTurn = !nextTurn;
+    displayController.updateMessage();
   };
 
   const winningConditions = [
@@ -91,7 +101,7 @@ const game = (() => {
     return board.isFull();
   };
 
-  return { start, validateMove };
+  return { start, validateMove, getCurrentPlayer };
 })();
 
 const displayController = (() => {
@@ -104,20 +114,46 @@ const displayController = (() => {
     square.textContent = player.sign;
   };
 
-  const displayResults = (winner) => {};
+  const displayResults = (winner) => {
+    let result = "";
+    if (winner === "draw") {
+      result = "It's a draw!";
+    } else {
+      result = `${winner} wins!`;
+    }
+    disableBoard();
+    const announcement = document.querySelector(".announcement");
+    announcement.textContent = result;
+    setTimeout(displayBoard, 2000);
+  };
+
+  const disableBoard = () => {
+    const grid = document.querySelectorAll(".square");
+    grid.forEach((square) => square.removeEventListener("click", validateMove));
+  };
+
   const displayBoard = () => {
+    updateMessage();
     const grid = document.querySelector(".grid");
+    grid.replaceChildren();
     for (let i = 0; i < 9; i++) {
       const square = document.createElement("div");
-      square.addEventListener("click", (event) => {
-        game.validateMove(event.target.getAttribute("data-index"));
-      });
+      square.addEventListener("click", validateMove);
       square.classList.add("square");
       square.setAttribute("data-index", i);
       grid.appendChild(square);
     }
   };
-  return { init, updateBoard };
+
+  const validateMove = (event) => {
+    game.validateMove(event.target.getAttribute("data-index"));
+  };
+
+  const updateMessage = () => {
+    const announcement = document.querySelector(".announcement");
+    announcement.textContent = `${game.getCurrentPlayer().name}, your turn`;
+  };
+  return { init, updateBoard, displayResults, updateMessage };
 })();
 
 game.start();

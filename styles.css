@@ -2,10 +2,11 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  font-family: "Caveat Brush", cursive;
 }
 
 h1 {
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   margin-bottom: 50px;
 }
 
@@ -37,4 +38,8 @@ body {
 
 .square:hover {
   cursor: pointer;
+}
+
+.announcement {
+  font-size: 1.6rem;
 }
