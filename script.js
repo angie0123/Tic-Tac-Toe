@@ -9,7 +9,12 @@ const board = (() => {
   const getSign = (index) => {
     return gameBoard[index];
   };
-  return { placeAt, isEmpty, getSign };
+
+  const isFull = () => {
+    return !gameBoard.includes(null);
+  };
+
+  return { placeAt, isEmpty, getSign, isFull };
 })();
 
 const player = (sign, name) => {
@@ -44,8 +49,11 @@ const game = (() => {
     board.placeAt(getCurrentPlayer(), index);
     displayController.updateBoard(getCurrentPlayer(), index);
     if (isWinningMove(index)) {
-      // displayController.displayWinner();
-      console.log(`${getCurrentPlayer().name} wins!`);
+      displayController.displayResults(getCurrentPlayer().name);
+    }
+    if (isDraw()) {
+      console.log("draw");
+      displayController.displayResults("draw");
     }
     nextTurn = !nextTurn;
   };
@@ -79,6 +87,10 @@ const game = (() => {
     return false;
   };
 
+  const isDraw = () => {
+    return board.isFull();
+  };
+
   return { start, validateMove };
 })();
 
@@ -92,6 +104,7 @@ const displayController = (() => {
     square.textContent = player.sign;
   };
 
+  const displayResults = (winner) => {};
   const displayBoard = () => {
     const grid = document.querySelector(".grid");
     for (let i = 0; i < 9; i++) {
